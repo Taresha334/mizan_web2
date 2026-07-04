@@ -1,14 +1,15 @@
 #!/bin/bash
 git config --global --add safe.directory '*'
 
-# Only download if flutter folder doesn't exist
+# 1. Download and extract if missing
 if [ ! -d "flutter" ]; then
+  echo "Downloading Flutter..."
   curl -sL https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.44.4-stable.tar.xz | tar xJ
 fi
 
-# Add the local flutter bin to the PATH for this session
-export PATH="$PATH:`pwd`/flutter/bin"
+# 2. Run commands using the direct path
+echo "Running pub get..."
+./flutter/bin/flutter pub get
 
-# Run the commands
-flutter pub get
-flutter build web --release --no-tree-shake-icons
+echo "Building web..."
+./flutter/bin/flutter build web --release --no-tree-shake-icons
