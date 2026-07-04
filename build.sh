@@ -1,7 +1,4 @@
 #!/bin/bash
-# Production-ready build script for Mizan PLC Web Application
-# This script handles Flutter SDK acquisition and project compilation.
-
 git config --global --add safe.directory '*'
 
 # 1. Download and extract Flutter if it is not already present
@@ -10,20 +7,22 @@ if [ ! -d "flutter" ]; then
   curl -sL https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.44.4-stable.tar.xz | tar xJ
 fi
 
-# 2. Run pub get to resolve all dependencies
+# 2. Prepare environment
+export PATH="$PATH:`pwd`/flutter/bin"
+
+# 3. Clean and build
+echo "Cleaning up..."
+./flutter/bin/flutter clean
 echo "Running pub get..."
 ./flutter/bin/flutter pub get
+echo "Building web..."
+./flutter/bin/flutter build web --release --no-tree-shake-icons
 
-# 3. Build the web project
-# --no-tree-shake-icons: Ensures all icons are available for the UI
-# --no-wasm: Disables WebAssembly compilation to ensure compatibility with older plugins
-echo "Building web application..."
-./flutter/bin/flutter build web --release --no-tree-shake-icons --no-wasm
-
-# 4. Final verification
+# 4. Success check
 if [ -d "build/web" ]; then
-  echo "Build completed successfully. Output located in build/web."
+  echo "Build successful."
+  exit 0
 else
-  echo "Build failed to generate the required build/web directory."
+  echo "Build failed."
   exit 1
 fi
